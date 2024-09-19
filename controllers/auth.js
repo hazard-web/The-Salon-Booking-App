@@ -2,7 +2,7 @@ const bcrypt = require('bcrypt');
 const path = require('path');
 const jwt = require('jsonwebtoken');
 const { User } = require('../models');
-
+  
 exports.loginPage = async (req, res) => {
     try {
         res.sendFile(path.join(__dirname, "../", "public", "views", "login.html"));

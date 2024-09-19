@@ -1,5 +1,7 @@
 const sequelize = require('../config/db');
 const User = require('./user');
+const Service = require('./service');
+const Booking = require('./booking');
 
 const initModels = async () => {
   await sequelize.sync({ alter: true });
@@ -11,4 +13,6 @@ initModels();
 module.exports = {
     initModels,
     User,
+    Booking,
+    Service
 };
