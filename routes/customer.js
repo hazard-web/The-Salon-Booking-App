@@ -3,7 +3,7 @@ const { customerPage, getAllServices, bookService, getCustomerBookings } = requi
 const { authMiddleware, roleMiddleware } = require('../middleware/auth');
 const customerRouter = express.Router();
 
-customerRouter.get('/', authMiddleware, roleMiddleware('Customer'), customerPage);
+customerRouter.get('/', customerPage);
 
 // Route to get all services
 customerRouter.get('/services', authMiddleware, roleMiddleware('Customer'), getAllServices);

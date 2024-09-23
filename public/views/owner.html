@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Salon Management</title>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/owner.css">
+</head>
+<body>
+  <h1>Salon Management</h1>
+
+  <section class="form-container" id="register-salon-section">
+    <h2>Register a New Salon</h2>
+    <form id="register-salon-form">
+      <input type="text" id="salon-name" placeholder="Salon Name" required />
+      <input type="text" id="salon-address" placeholder="Salon Address" required />
+      <input type="text" id="salon-phone" placeholder="Salon Phone" required />
+      <button type="submit">Register Salon</button>
+    </form>
+    <div class="result" id="register-salon-result"></div>
+  </section>
+
+
+  <div class="form-container" id="add-service-section">
+    <h2>Add a Service</h2>
+    <form id="add-service-form">
+      <input type="text" id="service-name" placeholder="Service Name" required />
+      <textarea id="service-description" placeholder="Service Description" required></textarea>
+      <input type="number" id="service-price" placeholder="Service Price" required />
+      <input type="number" id="service-duration" placeholder="Service Duration (minutes)" required />
+      <input type="text" id="salon-id" placeholder="Salon ID" required />
+      <button type="submit">Add Service</button>
+    </form>
+    <div class="result" id="add-service-result"></div>
+  </div>
+
+  <div class="form-container" id="get-services-section">
+    <h2>Get All Services of a Salon</h2>
+    <form id="get-services-form">
+      <input type="text" id="get-salon-id" placeholder="Salon ID" required />
+      <button type="submit">Get Services</button>
+    </form>
+    <div class="result" id="get-services-result"></div>
+  </div>
+
+  <div class="form-container" id="get-appointments-section">
+    <h2>Get Appointments</h2>
+    <form id="get-appointments-form">
+      <input type="text" id="appointments-salon-id" placeholder="Salon ID" required />
+      <button type="submit">Get Appointments</button>
+    </form>
+    <div class="result" id="get-appointments-result"></div>
+  </div>
+
+  <div class="form-container" id="get-history-section">
+    <h2>Get Service History</h2>
+    <form id="get-history-form">
+      <input type="text" id="history-salon-id" placeholder="Salon ID" required />
+      <button type="submit">Get History</button>
+    </form>
+    <div class="result" id="get-history-result"></div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+  <script src="js/owner.js"></script>
+</body>
+</html>

@@ -55,19 +55,33 @@ exports.register = async (req, res) => {
 exports.login = async (req, res) => {
     const { email, password } = req.body;
     try {
+        // Check if user exists
         const user = await User.findOne({ where: { email } });
         if (!user) {
             return res.status(404).json({ error: 'User not found' });
         }
+
+        // Compare provided password with hashed password in DB
         const isMatch = await bcrypt.compare(password, user.password);
         if (!isMatch) {
-            return res.status(400).json({ error: 'Invalid credentials' });
+            return res.status(401).json({ error: 'Invalid credentials' });
         }
-        const token = jwt.sign({ id: user.id, role: user.role }, process.env.JWT_SECRET, {
-            expiresIn: '1h',
+
+        // Generate JWT token
+        const authToken = jwt.sign(
+            { id: user.id, role: user.role },
+            process.env.JWT_SECRET,
+            { expiresIn: '1h' } // Token expires in 1 hour
+        );
+
+        // Send token and role in the response
+        res.json({
+            authToken, 
+            role: user.role
         });
-        res.json({ token });
     } catch (error) {
-        res.status(500).json({ error: error.message });
+        console.error('Login error:', error.message);
+        res.status(500).json({ error: 'Server error. Please try again later.' });
     }
 };
+

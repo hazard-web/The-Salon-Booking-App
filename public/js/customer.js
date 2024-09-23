@@ -1,126 +1,132 @@
 // DOM elements
-const servicesList = document.getElementById("services-list");
 const serviceSelect = document.getElementById("service-select");
-const bookingsList = document.getElementById("bookings-list");
 const bookingForm = document.getElementById("booking-form");
 const bookingMessage = document.getElementById("booking-message");
+const bookingsList = document.getElementById("bookings-list");
 
-// Define API base URL
+// API base URL
 const baseURL = 'http://localhost:4000/customer';
 
-// Function to get the auth token from local storage
+// Get auth token from local storage
 function getAuthToken() {
-    return localStorage.getItem('authToken');
+    const token = localStorage.getItem('authToken');
+    console.log("Retrieved Token:", token);
+    return token;
+}
+
+// Set authorization headers in Axios
+function setAuthHeader() {
+    const token = getAuthToken();
+    if (token) {
+        axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+    } else {
+        alert("You are not authenticated. Please log in.");
+        window.location.href = '/login'; // Redirect to login if no token
+    }
+}
+
+// Generic function to handle API requests
+async function apiRequest(method, url, data = null) {
+    setAuthHeader(); // Ensure headers are set
+    try {
+        const response = await axios({ method, url, data });
+        console.log(`${method.toUpperCase()} request to ${url} succeeded:`, response.data);
+        return response.data;
+    } catch (error) {
+        console.error(`Error during ${method.toUpperCase()} request to ${url}:`, error.response ? error.response.data : error.message);
+        alert("Error fetching services. Please try again later.");
+        throw error;
+    }
 }
 
 // Function to fetch and display available services
 async function fetchServices() {
-    const token = getAuthToken();
-    if (!token) {
-        alert("You are not authenticated. Please log in.");
-        return;
-    }
-
+    serviceSelect.innerHTML = '<option>Loading services...</option>'; // Show loading state
     try {
-        const response = await axios.get(`${baseURL}/services`, {
-            headers: {
-                'Authorization': `Bearer ${token}`
-            }
-        });
-
-        const services = response.data;
-
-        // Clear previous options in case of re-render
-        serviceSelect.innerHTML = '';
-
-        // Populate the dropdown with services
-        services.forEach(service => {
-            const option = document.createElement('option');
-            option.value = service.id;
-            option.textContent = service.name;
-            serviceSelect.appendChild(option);
-        });
-    } catch (error) {
-        console.error('Error fetching services:', error);
-        if (error.response && error.response.status === 401) {
-            alert("Unauthorized access. Please log in again.");
+        const services = await apiRequest('get', `${baseURL}/services`);
+        serviceSelect.innerHTML = ''; // Clear the loading option
+        if (services.length > 0) {
+            services.forEach(service => {
+                const option = document.createElement('option');
+                option.value = service.id;
+                option.textContent = service.name;
+                serviceSelect.appendChild(option);
+            });
+        } else {
+            serviceSelect.innerHTML = '<option>No services available</option>';
         }
+    } catch (error) {
+        serviceSelect.innerHTML = '<option>Error loading services</option>';
+        console.error('Failed to load services:', error);
     }
 }
 
-// Function to handle booking form submission
+// Function to handle form submission for booking
 async function handleBooking(event) {
     event.preventDefault();
-
     const serviceId = serviceSelect.value;
     const bookingDate = document.getElementById('booking-date').value;
-    bookingMessage.textContent = '';  // Clear previous messages
+    bookingMessage.textContent = '';
 
-    const token = getAuthToken();
-    if (!token) {
-        alert("You are not authenticated. Please log in.");
+    // Validate form inputs
+    if (!serviceId || !bookingDate) {
+        bookingMessage.textContent = 'Please select a service and enter a booking date.';
         return;
     }
 
     try {
-        const response = await axios.post(`${baseURL}/book`, {
-            serviceId,
-            bookingDate
-        }, {
-            headers: {
-                'Authorization': `Bearer ${token}`
-            }
-        });
+        const response = await apiRequest('post', `${baseURL}/book`, { serviceId, bookingDate });
+        
+        // Log the full response for debugging
+        console.log('Booking Response:', response);
 
-        bookingMessage.textContent = 'Service booked successfully!';
-        fetchBookings(); // Refresh bookings list
-    } catch (error) {
-        console.error('Error booking service:', error);
-        bookingMessage.textContent = 'Failed to book service. Please try again later.';
-        if (error.response && error.response.status === 401) {
-            alert("Unauthorized access. Please log in again.");
+        // Check for the message instead of success
+        if (response && response.message) { 
+            bookingMessage.textContent = response.message; // Use the message from the response
+            bookingForm.reset(); // Reset form
+            fetchBookings(); // Refresh bookings after a successful booking
+        } else {
+            console.error('Unexpected response format:', response);
+            bookingMessage.textContent = 'Booking failed. Please try again.'; // Handle failure
         }
+    } catch (error) {
+        console.error('Error during booking:', error);
+        bookingMessage.textContent = 'Failed to book service. Please try again later.';
     }
 }
 
 // Function to fetch and display customer bookings
 async function fetchBookings() {
-    const token = getAuthToken();
-    if (!token) {
-        alert("You are not authenticated. Please log in.");
-        return;
-    }
-
+    bookingsList.innerHTML = 'Loading your bookings...'; // Show loading state
     try {
-        const response = await axios.get(`${baseURL}/bookings`, {
-            headers: {
-                'Authorization': `Bearer ${token}`
+        const response = await apiRequest('get', `${baseURL}/bookings`); // Ensure apiRequest is properly defined
+
+        // Check if the response contains bookings
+        if (response && Array.isArray(response.bookings)) {
+            bookingsList.innerHTML = ''; // Clear previous bookings
+            if (response.bookings.length === 0) {
+                bookingsList.textContent = 'No bookings found.';
+            } else {
+                response.bookings.forEach(booking => {
+                    const bookingItem = document.createElement('div');
+                    // Make sure booking.service exists and has a name
+                    bookingItem.textContent = `Service: ${booking.service ? booking.service.name : 'Hair Cut'}, Date: ${booking.bookingDate}`;
+                    bookingsList.appendChild(bookingItem);
+                });
             }
-        });
-
-        const bookings = response.data;
-
-        // Clear existing bookings
-        bookingsList.innerHTML = '';
-
-        // Populate the list with bookings
-        bookings.forEach(booking => {
-            const bookingItem = document.createElement('div');
-            bookingItem.textContent = `Service: ${booking.serviceName}, Date: ${booking.bookingDate}`;
-            bookingsList.appendChild(bookingItem);
-        });
-    } catch (error) {
-        console.error('Error fetching bookings:', error);
-        if (error.response && error.response.status === 401) {
-            alert("Unauthorized access. Please log in again.");
+        } else {
+            throw new Error('Unexpected response format'); // Handle unexpected response
         }
+    } catch (error) {
+        console.error('Error fetching bookings:', error); // Log the error for debugging
+        bookingsList.innerHTML = 'Failed to load bookings. Please try again later.'; // Show error message
     }
 }
 
 // Initialize the page
 document.addEventListener('DOMContentLoaded', () => {
-    fetchServices();
-    fetchBookings();
-
-    bookingForm.addEventListener('submit', handleBooking);
+    setAuthHeader(); // Set auth headers initially
+    fetchServices(); // Load available services
+    fetchBookings(); // Load customer bookings
+    bookingForm.addEventListener('submit', handleBooking); // Handle form submission
 });
