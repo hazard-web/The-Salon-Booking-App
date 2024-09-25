@@ -53,7 +53,7 @@ signUpBtn.addEventListener("click", async (event) => {
 });
 
 // Handle Login
-lloginBtn.addEventListener("click", async (event) => {
+loginBtn.addEventListener("click", async (event) => {
   event.preventDefault();
 
   const loginDetails = {

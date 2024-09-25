@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard</title>
+    <link rel="stylesheet" href="css/admin.css">
+</head>
+<body>
+    <h1>Admin Dashboard</h1>
+
+    <section>
+        <h2>Users</h2>
+        <button id="fetchUsers">Get All Users</button>
+        <ul id="users-list"></ul> <!-- Changed from div to ul for list structure -->
+    </section>
+
+    <section>
+        <h2>Salons</h2>
+        <button id="fetchSalons">Get All Salons</button>
+        <ul id="salons-list"></ul> <!-- Changed from div to ul for list structure -->
+        <input type="number" id="salonId" placeholder="Salon ID">
+        <select id="approvalStatus">
+            <option value="true">Approve</option>
+            <option value="false">Disapprove</option>
+        </select>
+        <button id="approveSalon">Approve/Disapprove Salon</button>
+    </section>
+
+    <section>
+        <h2>Bookings</h2>
+        <button id="fetchBookings">Get All Bookings</button>
+        <ul id="bookings-list"></ul> <!-- Changed from div to ul for list structure -->
+    </section>
+
+    <section>
+        <h2>Payments</h2>
+        <button id="managePayments">Manage Payments</button>
+        <div id="paymentsResponse"></div>
+    </section>
+
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script src="js/admin.js"></script>
+</body>
+</html>
