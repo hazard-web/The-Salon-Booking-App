@@ -110,7 +110,7 @@ async function fetchBookings() {
                 response.bookings.forEach(booking => {
                     const bookingItem = document.createElement('div');
                     // Make sure booking.service exists and has a name
-                    bookingItem.textContent = `Service: ${booking.service ? booking.service.name : 'Hair Cut'}, Date: ${booking.bookingDate}`;
+                    bookingItem.textContent = `Service: ${booking.service ? booking.service.name : 'Hair Color'}, Date: ${booking.bookingDate}`;
                     bookingsList.appendChild(bookingItem);
                 });
             }

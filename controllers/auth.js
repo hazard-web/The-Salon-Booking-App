@@ -2,21 +2,21 @@ const bcrypt = require('bcrypt');
 const path = require('path');
 const jwt = require('jsonwebtoken');
 const { User } = require('../models');
-  
+
 exports.loginPage = async (req, res) => {
     try {
         res.sendFile(path.join(__dirname, "../", "public", "views", "login.html"));
-    } catch {
-        (err) => console.log(err);
+    } catch (err) {
+        console.log(err);
     }
 };
 
 // Controller for user registration
 exports.register = async (req, res) => {
-    const { username, email, password, role } = req.body;
+    const { username, email, password, role, mobileNumber } = req.body;
 
     // Basic input validation
-    if (!username || !email || !password || !role) {
+    if (!username || !email || !password || !role || !mobileNumber) {
         return res.status(400).json({ error: 'All fields are required.' });
     }
 
@@ -39,16 +39,22 @@ exports.register = async (req, res) => {
             email,
             password: hashedPassword,
             role,
+            mobileNumber // Save mobile number to the database
         });
 
         console.log('New user created:', newUser);
 
-
         res.status(201).json({ message: 'User registered successfully' });
     } catch (error) {
-        console.error('Registration error:', error); // Log error for internal tracking
+        console.error('Registration error:', error); // Log the complete error object
+        if (error.name === 'SequelizeValidationError') {
+            return res.status(400).json({ 
+                errors: error.errors.map(err => err.message) // Return detailed validation errors 
+            });
+        }
         res.status(500).json({ error: 'An error occurred during registration. Please try again later.' });
     }
+    
 };
 
 // Controller for user login
@@ -84,4 +90,3 @@ exports.login = async (req, res) => {
         res.status(500).json({ error: 'Server error. Please try again later.' });
     }
 };
-

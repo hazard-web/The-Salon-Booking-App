@@ -6,12 +6,13 @@ const path = require('path');
 const fs = require('fs');
 const cors = require('cors');
 
-const { authMiddleware, roleMiddleware } = require('./middleware/auth');
+// const { authMiddleware, roleMiddleware } = require('./middleware/auth');
 const sequelize = require('./config/db');
 const authRouter = require('./routes/auth');
 const customerRouter = require('./routes/customer');
 const ownerRouter = require('./routes/owner');
 const adminRouter = require('./routes/admin');
+const notificationRouter = require('./routes/notification');
 const { initModels } = require('./models');
 
 dotenv.config();
@@ -43,6 +44,7 @@ app.use('/auth', authRouter);
 app.use('/customer', customerRouter);
 app.use('/owner',ownerRouter);
 app.use('/admin', adminRouter);
+app.use('/notification', notificationRouter);
 
 app.use((req, res, next) => {
   console.log(`Request URL: ${req.url}`);

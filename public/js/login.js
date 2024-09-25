@@ -9,7 +9,8 @@ const loginPassword = document.getElementById("login-password");
 const regUsername = document.getElementById("register-username");
 const regEmail = document.getElementById("register-email");
 const regPassword = document.getElementById("register-password");
-const regRole = document.getElementById("register-role"); // Ensure this is present in your HTML
+const regRole = document.getElementById("register-role");
+const regMobile = document.getElementById("register-mobile"); // Add this line
 
 // Toggle between Sign Up and Sign In views
 signUp.addEventListener("click", () => {
@@ -28,18 +29,20 @@ signUpBtn.addEventListener("click", async (event) => {
     username: regUsername.value,
     email: regEmail.value,
     password: regPassword.value,
-    role: regRole.value
+    role: regRole.value,
+    mobileNumber: regMobile.value // Include mobile number in registration details
   };
 
   try {
     await axios.post('http://localhost:4000/register', registerDetails);
     alert('Registration successful! Please log in.');
-    
+
     // Reset form fields after successful registration
     regUsername.value = '';
     regEmail.value = '';
     regPassword.value = '';
     regRole.value = '';
+    regMobile.value = ''; // Reset mobile number field
     
     // Switch to Sign In view
     container.classList.remove("right-panel-active");

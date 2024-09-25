@@ -21,6 +21,14 @@ const User = sequelize.define('User', {
     type: DataTypes.STRING,
     allowNull: false,
   },
+  mobileNumber: {
+    type: DataTypes.STRING, 
+    allowNull: false,
+    validate: {
+      len: [10, 15], 
+      isNumeric: true, 
+    },
+  },
   role: {
     type: DataTypes.ENUM('Customer', 'Owner', 'Admin'),
     allowNull: false,
