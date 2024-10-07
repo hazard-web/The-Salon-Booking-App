@@ -24,6 +24,7 @@ const ownerRouter = require('./routes/owner');
 const adminRouter = require('./routes/admin');
 const notificationRouter = require('./routes/notification');
 const billingRouter = require('./routes/billing');
+const photoRouter = require('./routes/photo');
 const { initModels } = require('./models');
 
 const corsOptions = {
@@ -46,6 +47,7 @@ app.use('/owner',ownerRouter);
 app.use('/admin', adminRouter);
 app.use('/notification', notificationRouter);
 app.use('/billing', billingRouter);
+app.use('/photo', photoRouter);
 
 app.use((req, res, next) => {
   console.log(`Received ${req.method} request for ${req.url}`);

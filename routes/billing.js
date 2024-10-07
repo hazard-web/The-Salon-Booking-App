@@ -9,12 +9,8 @@ billingRouter.get('/services', authMiddleware, roleMiddleware('Customer'), fetch
 
 billingRouter.post('/create-checkout-session', authMiddleware, roleMiddleware('Customer'), createCheckoutSession);
 
-// billingRouter.get('/success', success_url);
-
-// Route to handle successful payment
 billingRouter.post('/payment-success', authMiddleware, roleMiddleware('Customer'), paymentSuccess);
 
-// Route to get billing history
 billingRouter.get('/billing-history', authMiddleware, roleMiddleware('Customer'), getBillingHistory);
 
 module.exports = billingRouter;
