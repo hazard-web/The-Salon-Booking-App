@@ -6,6 +6,16 @@ const path = require('path');
 const fs = require('fs');
 const cors = require('cors');
 
+require('dotenv').config();
+
+const app = express();
+
+app.use(express.json());
+app.use(bodyParser.json());
+
+app.use(express.static(path.join(__dirname, 'public')));
+
+
 // const { authMiddleware, roleMiddleware } = require('./middleware/auth');
 const sequelize = require('./config/db');
 const authRouter = require('./routes/auth');
@@ -13,18 +23,8 @@ const customerRouter = require('./routes/customer');
 const ownerRouter = require('./routes/owner');
 const adminRouter = require('./routes/admin');
 const notificationRouter = require('./routes/notification');
+const billingRouter = require('./routes/billing');
 const { initModels } = require('./models');
-
-dotenv.config();
-
-const app = express();
-
-app.use(express.static(path.join(__dirname, 'public')));
-console.log(path.join(__dirname, 'public'));
-
-app.use(express.json());
-app.use(bodyParser.json());
-
 
 const corsOptions = {
   origin: 'http://localhost:4000',  // Frontend origin
@@ -45,9 +45,10 @@ app.use('/customer', customerRouter);
 app.use('/owner',ownerRouter);
 app.use('/admin', adminRouter);
 app.use('/notification', notificationRouter);
+app.use('/billing', billingRouter);
 
 app.use((req, res, next) => {
-  console.log(`Request URL: ${req.url}`);
+  console.log(`Received ${req.method} request for ${req.url}`);
   next();
 });
 

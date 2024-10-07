@@ -3,6 +3,7 @@ const User = require('./user');
 const Service = require('./service');
 const Booking = require('./booking');
 const Salon = require('./salon');
+const Billing = require('./billing');
 
 // Define relationships with aliases
 User.hasMany(Salon, { foreignKey: 'ownerId' });
@@ -14,11 +15,14 @@ Service.belongsTo(Salon, { foreignKey: 'salonId' });
 Service.hasMany(Booking, { foreignKey: 'serviceId' });
 Booking.belongsTo(Service, { foreignKey: 'serviceId' });
 
-User.hasMany(Booking, { foreignKey: 'customerId', as: 'customer' }); // Use alias for customer
-Booking.belongsTo(User, { foreignKey: 'customerId', as: 'customer' }); // Consistent alias
+User.hasMany(Booking, { foreignKey: 'customerId', as: 'customer' }); 
+Booking.belongsTo(User, { foreignKey: 'customerId', as: 'customer' }); 
+
+User.hasMany(Billing, { foreignKey: 'customerId' });
+Billing.belongsTo(User, { foreignKey: 'customerId' });
 
 // Function to synchronize models with retry logic
-const executeWithRetry = async (action, retries = 5) => {
+const executeWithRetry = async (action, retries = 20) => {
   while (retries > 0) {
     try {
       return await action();
@@ -37,7 +41,7 @@ const executeWithRetry = async (action, retries = 5) => {
 
 const initModels = async () => {
   await executeWithRetry(async () => {
-    await sequelize.sync({ alter: true }); // Use { force: true } to drop and recreate tables in development
+    await sequelize.sync({ alter: false }); 
     console.log('All models were synchronized successfully.');
   });
 };
@@ -50,4 +54,5 @@ module.exports = {
   Service,
   Booking,
   Salon,
+  Billing,
 };

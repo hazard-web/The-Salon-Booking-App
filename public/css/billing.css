@@ -1,0 +1,111 @@
+/* Import Montserrat font from Google Fonts */
+@import url("https://fonts.googleapis.com/css?family=Montserrat:400,800");
+
+/* Basic reset */
+body, h1, h2, p, ul, li {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+/* Global styles */
+body {
+    font-family: 'Montserrat', sans-serif;
+    background-color: #f4f4f4;
+    color: #333;
+    line-height: 1.6;
+}
+
+.container {
+    max-width: 800px;
+    margin: 20px auto;
+    padding: 20px;
+    background: #fff;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+}
+
+/* Header styles */
+h1 {
+    text-align: center;
+    margin-bottom: 20px;
+    font-size: 2.5em;
+    color: #333;
+}
+
+h2 {
+    font-size: 1.8em;
+    margin: 20px 0 10px;
+    color: #555;
+}
+
+/* Form styles */
+#payment-form {
+    display: flex;
+    flex-direction: column;
+    gap: 10px; /* Space between elements */
+}
+
+label {
+    font-weight: bold;
+}
+
+input[type="number"] {
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 1em;
+}
+
+input[type="number"]:focus {
+    border-color: #007BFF;
+    outline: none;
+}
+
+/* Button styles */
+button {
+    padding: 10px;
+    background: #007BFF;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 1em;
+    transition: background 0.3s;
+}
+
+button:hover {
+    background: #0056b3;
+}
+
+/* Result and history styles */
+#payment-result {
+    margin-top: 20px;
+    font-size: 1.2em;
+    color: #333;
+}
+
+#billing-section {
+    margin-top: 40px; /* Space between sections */
+}
+
+#billing-history {
+    margin-top: 10px;
+}
+
+#billing-history li {
+    background: #e9ecef;
+    padding: 10px;
+    margin: 5px 0;
+    border-radius: 4px;
+}
+
+/* Button for fetching billing history */
+#fetch-billing {
+    margin-top: 10px;
+    background: #28a745; /* Green button */
+}
+
+#fetch-billing:hover {
+    background: #218838; /* Darker green on hover */
+}

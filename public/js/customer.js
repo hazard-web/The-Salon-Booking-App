@@ -3,6 +3,7 @@ const serviceSelect = document.getElementById("service-select");
 const bookingForm = document.getElementById("booking-form");
 const bookingMessage = document.getElementById("booking-message");
 const bookingsList = document.getElementById("bookings-list");
+const makePaymentButton = document.getElementById("make-payment-button"); // Reference to the Make Payment button
 
 // API base URL
 const baseURL = 'http://localhost:4000/customer';
@@ -99,7 +100,7 @@ async function handleBooking(event) {
 async function fetchBookings() {
     bookingsList.innerHTML = 'Loading your bookings...'; // Show loading state
     try {
-        const response = await apiRequest('get', `${baseURL}/bookings`); // Ensure apiRequest is properly defined
+        const response = await apiRequest('get', `${baseURL}/bookings`);
 
         // Check if the response contains bookings
         if (response && Array.isArray(response.bookings)) {
@@ -122,6 +123,11 @@ async function fetchBookings() {
         bookingsList.innerHTML = 'Failed to load bookings. Please try again later.'; // Show error message
     }
 }
+
+// Redirect to billing page when "Make Payment" button is clicked
+makePaymentButton.addEventListener('click', () => {
+    window.location.href = '/billing'; // Redirect to billing page
+});
 
 // Initialize the page
 document.addEventListener('DOMContentLoaded', () => {

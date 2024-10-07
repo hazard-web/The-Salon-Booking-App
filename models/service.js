@@ -33,6 +33,8 @@ const Service = sequelize.define('Service', {
   },
 }, {
   timestamps: true,
+  onDelete: 'CASCADE', // Optionally add this if you want cascading behavior
+  onUpdate: 'CASCADE',
 });
 
 module.exports = Service;
