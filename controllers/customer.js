@@ -1,7 +1,7 @@
 const { Service, Booking } = require('../models');
 const path = require('path');
 
-// Serve the customer page
+
 exports.customerPage = async (req, res) => {
   try {
     res.sendFile(path.join(__dirname, "../", "public", "views", "customer.html"));
@@ -11,7 +11,7 @@ exports.customerPage = async (req, res) => {
   }
 };
 
-// Controller to get all services
+
 exports.getAllServices = async (req, res) => {
   console.log('Fetching services for user:', req.user);
   try {
@@ -34,28 +34,24 @@ exports.bookService = async (req, res) => {
   const { serviceId, bookingDate } = req.body;
 
   try {
-    // Ensure the service ID and booking date are provided
     if (!serviceId || !bookingDate) {
       return res.status(400).json({ error: 'Service ID and booking date are required.' });
     }
 
-    // Check if the service exists (Optional: add validation to ensure service is valid)
     const service = await Service.findByPk(serviceId);
     if (!service) {
       return res.status(404).json({ error: 'Service not found.' });
     }
 
-    // Check if the booking date is in the future
     const currentDate = new Date();
     const parsedBookingDate = new Date(bookingDate);
     if (parsedBookingDate < currentDate) {
       return res.status(400).json({ error: 'Booking date must be in the future.' });
     }
 
-    // Create the booking
     const booking = await Booking.create({
       serviceId,
-      customerId: req.user.id, // User ID from auth middleware
+      customerId: req.user.id, 
       bookingDate: parsedBookingDate,
     });
 
@@ -64,12 +60,9 @@ exports.bookService = async (req, res) => {
   } catch (error) {
     console.error('Error booking service:', error.message);
 
-    // Handle Sequelize validation errors specifically
     if (error.name === 'SequelizeValidationError') {
       return res.status(400).json({ error: 'Validation error', details: error.errors });
     }
-
-    // Generic error response
     res.status(500).json({ error: 'Error booking service, please try again later.' });
   }
 };
@@ -86,7 +79,7 @@ exports.getCustomerBookings = async (req, res) => {
   try {
     const bookings = await Booking.findAll({
       where: { customerId: req.user.id },
-      include: [{ model: Service }] // Include the Service model
+      include: [{ model: Service }] 
     });
 
     if (bookings.length === 0) {

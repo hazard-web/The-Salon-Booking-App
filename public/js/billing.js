@@ -63,7 +63,7 @@ async function fetchServices() {
         services.forEach(service => {
             const option = document.createElement('option');
             option.value = service.id; // Adjust based on your service object structure
-            option.textContent = `${service.name} - $${(service.price / 100).toFixed(2)}`; // Display name and price
+            option.textContent = `${service.name} - ₹${(service.price).toFixed(2)}`; // Display name and price
             option.setAttribute('data-price', service.price); // Store price in a data attribute
             serviceSelect.appendChild(option);
         });
@@ -170,7 +170,7 @@ async function fetchBillingHistory() {
         // Display billing history
         billingHistory.forEach(bill => {
             const listItem = document.createElement('li');
-            listItem.textContent = `Amount: $${(bill.amount / 100).toFixed(2)}, Status: ${bill.status}`; // Convert to dollars
+            listItem.textContent = `Amount: ₹${(bill.amount).toFixed(2)}, Status: ${bill.status}`; // Convert to rupees
             billingHistoryList.appendChild(listItem);
         });
     } catch (error) {

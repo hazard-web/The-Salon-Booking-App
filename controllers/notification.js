@@ -34,7 +34,7 @@ exports.notifyBookingConfirmation = async (req, res) => {
       }
   
       // Log the mobileNumber
-      console.log('Mobile Number:', booking.customer.mobileNumber); // Log the mobile number
+      console.log('Mobile Number:', booking.customer.mobileNumber); 
   
       // Ensure the customer has a valid mobileNumber
       if (!booking.customer.mobileNumber) {
@@ -43,7 +43,7 @@ exports.notifyBookingConfirmation = async (req, res) => {
   
       // Send SMS notification
       const message = `Dear ${booking.customer.username}, your booking for ${booking.bookingDate} has been confirmed.`;
-      await sendSMS(booking.customer.mobileNumber, message); // Use mobileNumber here
+      await sendSMS(booking.customer.mobileNumber, message);
   
       res.json({ message: 'Booking confirmation notification sent successfully' });
     } catch (error) {

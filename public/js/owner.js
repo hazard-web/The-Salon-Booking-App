@@ -100,7 +100,7 @@ async function handleGetServices(event) {
         if (services.length > 0) {
             services.forEach(service => {
                 const serviceItem = document.createElement('div');
-                serviceItem.textContent = `Service: ${service.name}, Price: $${service.price}`;
+                serviceItem.textContent = `Service: ${service.name}, Price: ₹${service.price}`;
                 getServicesResult.appendChild(serviceItem);
             });
         } else {
@@ -119,20 +119,29 @@ async function handleGetAppointments(event) {
 
     try {
         const appointments = await apiRequest('get', `${baseURL}/appointments/${salonId}`);
+        console.log(appointments); // Log the appointments for inspection
         getAppointmentsResult.innerHTML = ''; // Clear previous results
+        
         if (appointments.length > 0) {
             appointments.forEach(appointment => {
                 const appointmentItem = document.createElement('div');
-                appointmentItem.textContent = `Appointment for: ${appointment.serviceName} on ${appointment.date}`;
+                
+                // Assuming the service name and booking date are structured this way
+                const serviceName = appointment.Service ? appointment.Service.name : 'Unknown Service';
+                const bookingDate = appointment.bookingDate ? new Date(appointment.bookingDate).toLocaleString() : 'Unknown Date';
+
+                appointmentItem.textContent = `Appointment for: ${serviceName} on ${bookingDate}`;
                 getAppointmentsResult.appendChild(appointmentItem);
             });
         } else {
             getAppointmentsResult.textContent = 'No appointments found for this salon.';
         }
     } catch (error) {
+        console.error('Error during GET request:', error); // Log the error for debugging
         getAppointmentsResult.textContent = 'Failed to load appointments. Please try again.';
     }
 }
+
 
 // Function to get service history of a salon
 async function handleGetHistory(event) {

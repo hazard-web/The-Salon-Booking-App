@@ -1,4 +1,4 @@
-const { Salon, Service, Booking, User } = require('../models'); // Ensure User is imported
+const { Salon, Service, Booking, User, Billing } = require('../models'); 
 const path = require('path');
 
 // Serve the owner dashboard page
@@ -76,24 +76,22 @@ exports.getSalonServices = async (req, res) => {
 
 // Manage appointments
 exports.getAppointments = async (req, res) => {
-    const { salonId } = req.params;
-
-    // Validate salonId
-    if (!salonId) {
-        return res.status(400).json({ error: 'salonId is required.' });
-    }
-
     try {
         const appointments = await Booking.findAll({
-            where: { salonId },
-            include: [Service, { model: User, as: 'customer' }],
+            include: [
+                {
+                    model: Service,
+                    where: { salonId: req.params.salonId }
+                },
+                { model: User, as: 'customer' }
+            ]
         });
         res.json(appointments);
     } catch (error) {
-        console.error('Error fetching appointments:', error);
         res.status(500).json({ error: error.message });
     }
 };
+
 
 // Get service history
 exports.getServiceHistory = async (req, res) => {

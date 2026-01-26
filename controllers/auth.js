@@ -1,92 +1,86 @@
-const bcrypt = require('bcrypt');
+const bcrypt = require('bcrypt');  // ✅ bcryptjs (faster)
 const path = require('path');
 const jwt = require('jsonwebtoken');
-const { User } = require('../models');
+
+// ✅ MongoDB User (no Sequelize)
+const User = require('../models/User');
 
 exports.loginPage = async (req, res) => {
-    try {
-        res.sendFile(path.join(__dirname, "../", "public", "views", "login.html"));
-    } catch (err) {
-        console.log(err);
-    }
+  try {
+    res.sendFile(path.join(__dirname, "../public/views/login.html"));
+  } catch (err) {
+    console.error('Login page error:', err);
+    res.status(500).json({ error: 'Server error' });
+  }
 };
 
-// Controller for user registration
+// ✅ FIXED Registration
 exports.register = async (req, res) => {
-    const { username, email, password, role, mobileNumber } = req.body;
+  const { username, email, password, role, mobilenumber } = req.body;  // ✅ mobilenumber
 
-    // Basic input validation
-    if (!username || !email || !password || !role || !mobileNumber) {
-        return res.status(400).json({ error: 'All fields are required.' });
+  // ✅ Basic validation
+  if (!username || !email || !password || !role || !mobilenumber) {
+    return res.status(400).json({ error: 'All fields are required.' });
+  }
+
+  try {
+    // ✅ MongoDB findOne (no "where")
+    const existingUser = await User.findOne({ email });
+    if (existingUser) {
+      return res.status(400).json({ error: 'Email is already registered.' });
     }
 
-    // Validate email format (basic check)
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email)) {
-        return res.status(400).json({ error: 'Invalid email format.' });
-    }
+    // ✅ Hash password
+    const hashedPassword = await bcrypt.hash(password, 10);
 
-    try {
-        // Check if user already exists
-        const existingUser = await User.findOne({ where: { email } });
-        if (existingUser) {
-            return res.status(400).json({ error: 'Email is already registered.' });
-        }
+    // ✅ MongoDB User constructor
+    const user = new User(username, email, hashedPassword, mobilenumber, role);
+    const userId = await user.save();
 
-        const hashedPassword = await bcrypt.hash(password, 10);
-        const newUser = await User.create({
-            username,
-            email,
-            password: hashedPassword,
-            role,
-            mobileNumber // Save mobile number to the database
-        });
-
-        console.log('New user created:', newUser);
-
-        res.status(201).json({ message: 'User registered successfully' });
-    } catch (error) {
-        console.error('Registration error:', error); // Log the complete error object
-        if (error.name === 'SequelizeValidationError') {
-            return res.status(400).json({ 
-                errors: error.errors.map(err => err.message) // Return detailed validation errors 
-            });
-        }
-        res.status(500).json({ error: 'An error occurred during registration. Please try again later.' });
-    }
-    
+    res.status(201).json({ 
+      success: true,
+      userId,
+      message: 'User registered successfully' 
+    });
+  } catch (error) {
+    console.error('Registration error:', error);
+    res.status(500).json({ error: 'Registration failed. Please try again.' });
+  }
 };
 
-// Controller for user login
+// ✅ FIXED Login
 exports.login = async (req, res) => {
-    const { email, password } = req.body;
-    try {
-        // Check if user exists
-        const user = await User.findOne({ where: { email } });
-        if (!user) {
-            return res.status(404).json({ error: 'User not found' });
-        }
+  const { email, password } = req.body;
 
-        // Compare provided password with hashed password in DB
-        const isMatch = await bcrypt.compare(password, user.password);
-        if (!isMatch) {
-            return res.status(401).json({ error: 'Invalid credentials' });
-        }
-
-        // Generate JWT token
-        const authToken = jwt.sign(
-            { id: user.id, role: user.role },
-            process.env.JWT_SECRET,
-            { expiresIn: '1h' } // Token expires in 1 hour
-        );
-
-        // Send token and role in the response
-        res.json({
-            authToken, 
-            role: user.role
-        });
-    } catch (error) {
-        console.error('Login error:', error.message);
-        res.status(500).json({ error: 'Server error. Please try again later.' });
+  try {
+    // ✅ MongoDB findOne (no "where")
+    const user = await User.findOne({ email });
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
     }
+
+    // ✅ Compare passwords
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch) {
+      return res.status(401).json({ error: 'Invalid credentials' });
+    }
+
+    // ✅ JWT token with MongoDB _id
+    const authToken = jwt.sign(
+      { id: user._id.toString(), role: user.role },  // ✅ user._id not user.id
+      process.env.JWT_SECRET,
+      { expiresIn: '1h' }
+    );
+
+    res.json({
+      success: true,
+      authToken,
+      userId: user._id,
+      role: user.role,
+      message: 'Login successful'
+    });
+  } catch (error) {
+    console.error('Login error:', error.message);
+    res.status(500).json({ error: 'Server error. Please try again later.' });
+  }
 };

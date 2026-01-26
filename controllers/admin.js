@@ -1,4 +1,4 @@
-const { User, Salon, Booking, Revenue } = require('../models');
+const { User, Salon, Booking} = require('../models');
 const path = require('path');
 
 
@@ -53,12 +53,12 @@ exports.getAllBookings = async (req, res) => {
         const bookings = await Booking.findAll({
             include: [
                 // { model: Service, as: 'service' }, 
-                { model: User, as: 'customer' } // Using 'customer' as alias
+                { model: User, as: 'customer' } 
             ]
         });
         res.json(bookings);
     } catch (error) {
-        console.error("Error fetching bookings:", error); // Log the full error object
+        console.error("Error fetching bookings:", error); 
         res.status(500).json({ error: error.message });
     }
 };

@@ -1,5 +1,5 @@
 const Razorpay = require('razorpay');
-const { Billing, Service } = require('../models');
+const Billing = require('../models/billing'); // ✅ Your MongoDB class
 const path = require('path');
 
 // Initialize Razorpay instance
@@ -18,14 +18,16 @@ exports.billingPage = async (req, res) => {
     }
 };
 
-// Middleware to fetch services based on the request (if needed)
+// ✅ MOCK fetchServices (no Service model needed yet)
 exports.fetchServices = async (req, res) => {
     try {
-        const { salonId } = req.query; // Expecting salonId in query params
-        const services = salonId
-            ? await Service.findAll({ where: { salonId } })
-            : await Service.findAll(); // Fetch all services if no salonId provided
-
+        const { salonId } = req.query;
+        // Mock data for testing
+        const services = [
+            { id: 1, name: 'Haircut', price: 500 },
+            { id: 2, name: 'Hair Color', price: 1500 },
+            { id: 3, name: 'Massage', price: 800 }
+        ];
         res.json(services);
     } catch (error) {
         console.error('Error fetching services:', error);
@@ -37,35 +39,24 @@ exports.createCheckoutSession = async (req, res) => {
     console.log('Creating Razorpay order...');
     try {
         const { amount, serviceId } = req.body;
-
-        // Extract customerId from the authenticated user
-        const customerId = req.user.id; // Assuming user ID is set in req.user after authentication
+        const customerId = 123; // Mock for now (add auth later)
 
         console.log('Customer ID:', customerId);
 
-        // Validate inputs
         if (!amount || typeof amount !== 'number' || amount <= 0) {
             return res.status(400).json({ error: 'Invalid amount provided' });
         }
 
-        // Fetch the service based on serviceId
-        const service = await Service.findByPk(serviceId);
-        if (!service) {
-            return res.status(404).json({ error: 'Service not found' });
-        }
-
-        // Create a Razorpay order with customerId in notes
         const order = await razorpay.orders.create({
-            amount: Math.round(service.price * 100), // Convert to paise
+            amount: Math.round(amount * 100),
             currency: "INR",
             receipt: `receipt_${serviceId}`,
             payment_capture: 1,
             notes: {
-                customerId: customerId // Pass the customer ID
+                customerId: customerId 
             }
         });
 
-        // Return order details to the frontend
         res.status(201).json({
             orderId: order.id,
             amount: order.amount,
@@ -76,7 +67,6 @@ exports.createCheckoutSession = async (req, res) => {
         res.status(500).json({ error: 'Failed to create payment order' });
     }
 };
-
 
 exports.paymentSuccess = async (req, res) => {
     const { razorpayPaymentId, razorpayOrderId, razorpaySignature } = req.body;
@@ -95,38 +85,28 @@ exports.paymentSuccess = async (req, res) => {
             return res.status(400).json({ error: 'Payment verification failed' });
         }
 
-        // Fetch payment details from Razorpay
         const paymentDetails = await razorpay.payments.fetch(razorpayPaymentId);
         console.log('Payment details:', paymentDetails);
 
-        // Retrieve customerId from payment details
-        const customerId = paymentDetails.notes?.customerId;
+        const customerId = paymentDetails.notes?.customerId || 123;
 
-        if (!customerId) {
-            console.error('Invalid customerId: undefined');
-            return res.status(400).json({ error: 'Invalid customerId' });
-        }
+        // ✅ USE YOUR MONGODB BILLING CLASS
+        const billing = new Billing(
+            customerId,
+            paymentDetails.amount / 100,
+            paymentDetails.id
+        );
+        await billing.save(); // ✅ Saves to MongoDB!
 
-        // Save billing information to the database
-        const billing = await Billing.create({
-            customerId: customerId,  // This should now have a valid value
-            amount: paymentDetails.amount / 100,  // Convert from paise to INR
-            paymentIntentId: paymentDetails.id,
-            status: paymentDetails.status
-        });
+        console.log('✅ Billing record saved to MongoDB!');
 
-        console.log('Billing record created:', billing);
-
-        // Send the success response with billing details
         res.status(201).json({
-            message: 'Payment recorded successfully',
+            message: 'Payment recorded successfully in MongoDB',
             billing: {
-                customerId: billing.customerId,
-                amount: billing.amount,
-                paymentIntentId: billing.paymentIntentId,
-                status: billing.status,
-                createdAt: billing.createdAt,
-                billingDetails: paymentDetails
+                customerId: customerId,
+                amount: paymentDetails.amount / 100,
+                paymentIntentId: paymentDetails.id,
+                status: paymentDetails.status
             }
         });
     } catch (error) {
@@ -135,15 +115,17 @@ exports.paymentSuccess = async (req, res) => {
     }
 };
 
-// Controller to get billing history for a customer
 exports.getBillingHistory = async (req, res) => {
     try {
-        const billingHistory = await Billing.findAll({
-            where: { customerId: req.user.id }, // Ensure req.user.id is populated correctly
-            order: [['createdAt', 'DESC']], // Order by the most recent billing entries
-        });
+        const getdb = require('../config/db').getdb;
+        const db = getdb();
+        const customerId = 123; // Mock for now
 
-        // Check if the user has billing history
+        const billingHistory = await db.collection('Billing')
+            .find({ customerId: customerId })
+            .sort({ createdAt: -1 })
+            .toArray();
+
         if (billingHistory.length === 0) {
             return res.status(404).json({ message: 'No billing history found for this user' });
         }

@@ -1,14 +1,34 @@
+// DOM elements
+const confirmationForm = document.getElementById('confirmationForm');
+const bookingIdInput = document.getElementById('bookingId');
+const confirmationMessage = document.getElementById('confirmationMessage');
 
-// Event listener for sending booking confirmation
-document.getElementById('confirmationForm').addEventListener('submit', async function (e) {
-    e.preventDefault();
+const reminderForm = document.getElementById('reminderForm');
+const reminderBookingIdInput = document.getElementById('reminderBookingId');
+const reminderMessage = document.getElementById('reminderMessage');
 
-    const bookingId = document.getElementById('bookingId').value;
+// Function to get auth token from local storage
+function getAuthToken() {
+    const token = localStorage.getItem('authToken');
+    console.log("Retrieved Token:", token);
+    return token;
+}
 
+// Set authorization header for Axios requests
+function setAuthHeader() {
+    const token = getAuthToken();
+    if (token) {
+        axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+    } else {
+        alert("You are not authenticated. Please log in.");
+        window.location.href = '/login'; // Redirect to login if token is missing
+    }
+}
+
+// Function to send booking confirmation
+async function sendBookingConfirmation(bookingId) {
     try {
-        // Get the token from local storage
-        const token = localStorage.getItem('authToken');
-
+        const token = getAuthToken();
         if (!token) {
             throw new Error('User is not authenticated');
         }
@@ -21,23 +41,17 @@ document.getElementById('confirmationForm').addEventListener('submit', async fun
             }
         });
 
-        document.getElementById('confirmationMessage').innerText = response.data.message;
+        confirmationMessage.innerText = response.data.message;
     } catch (err) {
         console.error('Error sending confirmation:', err);
-        document.getElementById('confirmationMessage').innerText = `Error sending confirmation: ${err.response ? err.response.data.error : err.message}`;
+        confirmationMessage.innerText = `Error sending confirmation: ${err.response ? err.response.data.error : err.message}`;
     }
-});
+}
 
-// Event listener for sending booking reminder
-document.getElementById('reminderForm').addEventListener('submit', async function (e) {
-    e.preventDefault();
-
-    const bookingId = document.getElementById('reminderBookingId').value;
-
+// Function to send booking reminder
+async function sendBookingReminder(bookingId) {
     try {
-        // Get the token from local storage
-        const token = localStorage.getItem('authToken');
-
+        const token = getAuthToken();
         if (!token) {
             throw new Error('User is not authenticated');
         }
@@ -50,9 +64,28 @@ document.getElementById('reminderForm').addEventListener('submit', async functio
             }
         });
 
-        document.getElementById('reminderMessage').innerText = response.data.message;
+        reminderMessage.innerText = response.data.message;
     } catch (err) {
         console.error('Error sending reminder:', err);
-        document.getElementById('reminderMessage').innerText = `Error sending reminder: ${err.response ? err.response.data.error : err.message}`;
+        reminderMessage.innerText = `Error sending reminder: ${err.response ? err.response.data.error : err.message}`;
     }
+}
+
+// Event listener for sending booking confirmation
+confirmationForm.addEventListener('submit', function (e) {
+    e.preventDefault();
+    const bookingId = bookingIdInput.value;
+    sendBookingConfirmation(bookingId);
+});
+
+// Event listener for sending booking reminder
+reminderForm.addEventListener('submit', function (e) {
+    e.preventDefault();
+    const bookingId = reminderBookingIdInput.value;
+    sendBookingReminder(bookingId);
+});
+
+// Initialize token in Axios on page load
+document.addEventListener('DOMContentLoaded', () => {
+    setAuthHeader();
 });

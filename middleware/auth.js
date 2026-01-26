@@ -1,7 +1,7 @@
 const jwt = require('jsonwebtoken');
 
 const authMiddleware = (req, res, next) => {
-    console.log('Request Headers:', req.headers); // Log all headers
+    console.log('Request Headers:', req.headers); 
     // Extract the Authorization header
     const authHeader = req.header('Authorization');
     console.log('Authorization Header:', authHeader);
@@ -17,7 +17,7 @@ const authMiddleware = (req, res, next) => {
     try {
         // Verify the token
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
-        req.user = decoded; // Attach decoded token (user info) to req object
+        req.user = decoded; 
 
         // Debugging: Log the decoded token for verification
         console.log('Decoded token:', decoded);
