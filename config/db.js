@@ -18,35 +18,48 @@
 
 // module.exports = sequelize;
 
-
-const mongodb = require('mongodb');
-const { Client } = require('twilio/lib/base/BaseTwilio');
-const MongoClient = mongodb.MongoClient;
+const { MongoClient } = require('mongodb');
 
 let _db;
+const MONGODB_URI = process.env.MONGODB_URI;
 
-Mongoconnect = (callback) => {
-  MongoClient.connect('mongodb+srv://maximilian:CR9KZnb8pRcyQ4Qu@cluster0.uioeyxz.mongodb.net/?appName=Cluster0'
-    )
-    .then( client => {
-      console.log('Connection Established Successfully');
-      _db = client.db();
-      callback();
-
-    })
-    .catch(err => {
-      console.log(err);
-      throw err;
+const Mongoconnect = async (callback) => {
+  try {
+    const client = await MongoClient.connect(MONGODB_URI, {
+      // Critical TLS fixes for Atlas
+      tls: true,
+      autoSelectFamily: false,  // Fixes IPv6 resolution issues
+      family: 4,                // Force IPv4 only
+      
+      // Connection timeouts
+      connectTimeoutMS: 10000,
+      serverSelectionTimeoutMS: 5000,
+      socketTimeoutMS: 45000,
+      
+      // Atlas API version (required)
+      serverApi: {
+        version: '1',  // or ServerApiVersion.v1 if imported
+        strict: true,
+        deprecationErrors: true
+      },
+      
+      // SSL rejectUnauthorized fix (Atlas default CA)
+      rejectUnauthorized: true
     });
+
+    console.log('✅ MongoDB Connection Established Successfully');
+    _db = client.db();
+    if (callback) callback(null);
+    
+  } catch (err) {
+    console.error('❌ MongoDB connection failed:', err.message);
+    if (callback) callback(err);
+  }
 };
 
-
 const getdb = () => {
-  if(_db){
-    return _db;
-  }
-  throw 'No error found!';
-}
+  if (_db) return _db;
+  throw new Error('Database not initialized. Call Mongoconnect() first.');
+};
 
-exports.Mongoconnect = Mongoconnect;
-exports.getdb = getdb;
+module.exports = { Mongoconnect, getdb };

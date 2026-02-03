@@ -27,6 +27,7 @@ app.use(cors(corsOptions));  // ✅ ADD THIS!
 
 // ✅ Import routers
 const Mongoconnect = require('./config/db').Mongoconnect;
+const { initModels } = require('./models');
 const authRouter = require('./routes/auth');
 const customerRouter = require('./routes/customer');
 const ownerRouter = require('./routes/owner');
@@ -62,9 +63,15 @@ app.use((req, res) => {
 
 const PORT = process.env.PORT || 4000;
 
-// ✅ Start server
-Mongoconnect(() => {
-  app.listen(PORT, () => {
-    console.log(`✅ Server running on ${PORT}`);
-  });
+// ✅ Start server (boot even if DB is down)
+app.listen(PORT, () => {
+  console.log(`✅ Server running on ${PORT}`);
+});
+
+// Connect to MongoDB in the background and init models when ready
+Mongoconnect((err) => {
+  if (err) return; // logged inside Mongoconnect
+  initModels().catch((initErr) =>
+    console.error('❌ Failed to initialize models:', initErr)
+  );
 });

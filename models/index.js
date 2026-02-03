@@ -101,5 +101,5 @@ module.exports = {
   Billing,
 };
 
-// ✅ Auto-init on require (optional)
-initModels().catch(console.error);
+// IMPORTANT:
+// Do NOT auto-init on require. `initModels()` needs an active DB connection.
