@@ -1,0 +1,25 @@
+{
+  "compilerOptions": {
+    "target": "ESNext",
+    "module": "ESNext", // Updated to generate browser-compatible JavaScript
+    "moduleResolution": "Node", // Adjusted for compatibility
+    "outDir": "./dist",
+    "strict": true,
+    "typeRoots": ["./types", "./node_modules/@types"] // Added typeRoots to include custom types
+  },
+  "include": [
+    "server.ts",
+    "config/**/*.ts",
+    "controllers/**/*.ts",
+    "middleware/**/*.ts",
+    "models/**/*.ts",
+    "routes/**/*.ts",
+    "utils/**/*.ts"
+  ],
+  "exclude": [
+    "node_modules",
+    "public/js",
+    "**/*.html",
+    "public/css"
+  ]
+}

@@ -1,0 +1,73 @@
+body {
+    font-family: 'Montserrat', sans-serif;
+    background-color: #f4f4f4;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+}
+
+h1, h2 {
+    font-weight: 800;
+    color: #333;
+    margin-bottom: 20px;
+}
+
+form {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background-color: white;
+    padding: 20px;
+    margin-bottom: 30px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 400px;
+}
+
+input[type="text"], 
+input[type="file"], 
+button {
+    width: 100%;
+    padding: 10px;
+    margin: 10px 0;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+
+button {
+    background-color: #007BFF;
+    color: white;
+    cursor: pointer;
+    border: none;
+    font-weight: 600;
+}
+
+button:hover {
+    background-color: #0056b3;
+}
+
+/* Photo List */
+#photoList {
+    width: 100%;
+    max-width: 600px;
+}
+
+.photo-item {
+    background-color: white;
+    padding: 15px;
+    border-radius: 8px;
+    margin: 10px 0;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    text-align: center;
+}
+
+.photo-item img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 8px;
+}

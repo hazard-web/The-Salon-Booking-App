@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Notification Management</title>
+  <link rel="stylesheet" href="css/notification.css">
+</head>
+<body>
+  <div class="container">
+    <h1>Notification Management</h1>
+
+    <!-- Section to Notify Booking Confirmation -->
+    <div class="notification-section">
+      <h2>Send Booking Confirmation</h2>
+      <form id="confirmationForm">
+        <label for="bookingId">Booking ID:</label>
+        <input type="text" id="bookingId" name="bookingId" required>
+        <button type="submit">Send Confirmation</button>
+      </form>
+      <p id="confirmationMessage"></p>
+    </div>
+
+    <!-- Section to Send Reminder -->
+    <div class="notification-section">
+      <h2>Send Booking Reminder</h2>
+      <form id="reminderForm">
+        <label for="reminderBookingId">Booking ID:</label>
+        <input type="text" id="reminderBookingId" name="bookingId" required>
+        <button type="submit">Send Reminder</button>
+      </form>
+      <p id="reminderMessage"></p>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+  <script src="js/notification.js"></script>
+</body>
+</html>
