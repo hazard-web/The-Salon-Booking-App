@@ -1,6 +1,6 @@
 const { MongoClient } = require('mongodb');
 
-const MONGODB_URI = "mongodb+srv://shivambhardwaj403_db_user:hrsEeokrnk37gcqA@cluster0.sx2oflw.mongodb.net/?retryWrites=true&w=majority";
+const MONGODB_URI = process.env.MONGODB_URI;
 
 const testConnection = async () => {
     try {

@@ -5,7 +5,9 @@
     "moduleResolution": "Node", // Adjusted for compatibility
     "outDir": "./dist",
     "strict": true,
-    "typeRoots": ["./types", "./node_modules/@types"] // Added typeRoots to include custom types
+    "typeRoots": ["./types", "./node_modules/@types"], // Added typeRoots to include custom types
+    "allowSyntheticDefaultImports": true, // Enabled to allow default imports for modules without default exports
+    "esModuleInterop": true // Enabled to allow default imports for CommonJS modules
   },
   "include": [
     "server.ts",
